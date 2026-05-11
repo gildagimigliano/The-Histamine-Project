@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Histamine Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0818;
+  --bg-card: #160f28;
+  --bg-card2: #1e1535;
+  --purple-deep: #3d2070;
+  --purple: #6b3a9e;
+  --mauve: #a87d9e;
+  --mauve-light: #c9a8c2;
+  --accent: #e8d44d;
+  --cream: #f0ead0;
+  --text: #ede8f5;
+  --text-muted: #9b93b5;
+  --danger: #e05c7a;
+  --success: #6bbf8e;
+  --border: rgba(168,125,158,0.2);
+  --border-focus: rgba(168,125,158,0.55);
+  --radius: 14px;
+  --radius-sm: 9px;
+  --tr: 0.22s ease;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'DM Sans',system-ui,sans-serif;
+  font-size:1rem;
+  line-height:1.65;
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* grain */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  opacity:0.042;pointer-events:none;z-index:999;
+}
+/* ambient glow */
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 55% 40% at 85% 5%,rgba(107,58,158,0.18) 0%,transparent 60%),
+    radial-gradient(ellipse 45% 50% at 5% 90%,rgba(61,32,112,0.22) 0%,transparent 60%),
+    radial-gradient(ellipse 35% 30% at 50% 55%,rgba(168,125,158,0.06) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── PAGE SHELL ── */
+.page{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:2rem 1rem;
+}
+.page.hidden{display:none!important}
+
+/* ── LANDING ── */
+.landing{max-width:660px;width:100%;text-align:center}
+.stars{display:flex;justify-content:center;gap:.5rem;margin-bottom:1.5rem;font-size:.65rem;color:var(--mauve);letter-spacing:.4em}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--mauve);margin-bottom:.75rem}
+.landing-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2.8rem,9vw,5.2rem);
+  font-weight:700;line-height:1.04;
+  color:var(--cream);margin-bottom:.6rem;
+}
+.landing-title em{font-style:italic;color:var(--accent)}
+.landing-sub{
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1rem,3vw,1.3rem);
+  font-style:italic;color:var(--mauve-light);
+  margin-bottom:2rem;line-height:1.5;
+}
+.landing-body{
+  font-size:.93rem;color:var(--text-muted);
+  max-width:510px;margin:0 auto 2rem;
+  line-height:1.75;
+}
+.landing-body strong{color:var(--text);font-weight:500}
+.landing-meta{
+  display:flex;justify-content:center;
+  gap:1.75rem;flex-wrap:wrap;
+  margin-bottom:2.5rem;
+  font-size:.82rem;color:var(--text-muted);
+}
+.landing-meta span::before{content:'◆ ';color:var(--mauve);font-size:.55rem;vertical-align:middle;margin-right:.1rem}
+.privacy{margin-top:1.4rem;font-size:.76rem;color:var(--text-muted);opacity:.75}
+.privacy::before{content:'🔒 '}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:linear-gradient(135deg,var(--purple) 0%,var(--mauve) 100%);
+  color:#fff;font-family:'DM Sans',sans-serif;
+  font-size:1.05rem;font-weight:600;
+  padding:1rem 2.5rem;border:none;border-radius:100px;
+  cursor:pointer;transition:all var(--tr);
+  box-shadow:0 4px 22px rgba(107,58,158,0.42);
+  letter-spacing:.02em;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(107,58,158,.55)}
+.btn-primary:active{transform:translateY(0)}
+
+/* ── PROGRESS ── */
+.progress-bar{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:.7rem 1.25rem;
+  background:rgba(13,8,24,.88);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:.9rem;
+}
+.progress-bar.hidden{display:none!important}
+.prog-label{font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mauve);white-space:nowrap}
+.prog-track{flex:1;height:4px;background:rgba(168,125,158,.2);border-radius:100px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:100px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.prog-name{font-size:.7rem;color:var(--text-muted);white-space:nowrap;display:none}
+@media(min-width:540px){.prog-name{display:block}}
+
+/* ── SURVEY WRAPPER ── */
+.survey-wrap{width:100%;max-width:680px;padding-top:4.5rem;padding-bottom:3rem}
+.section-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:2.25rem 1.5rem;
+}
+@media(min-width:540px){.section-card{padding:3rem 3rem}}
+
+/* card in/out */
+@keyframes sIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-28px)}}
+@keyframes sInBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes sOutBack{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(28px)}}
+.anim-in{animation:sIn .3s cubic-bezier(.4,0,.2,1) both}
+.anim-out{animation:sOut .2s cubic-bezier(.4,0,.2,1) both}
+.anim-in-back{animation:sInBack .3s cubic-bezier(.4,0,.2,1) both}
+.anim-out-back{animation:sOutBack .2s cubic-bezier(.4,0,.2,1) both}
+
+.s-eyebrow{font-size:.68rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--mauve);margin-bottom:.4rem}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.6rem,5vw,2.25rem);font-weight:700;color:var(--cream);margin-bottom:.4rem;line-height:1.2}
+.s-intro{font-size:.88rem;color:var(--text-muted);margin-bottom:2rem;font-style:italic;line-height:1.65}
+
+/* ── FORM ── */
+.field-group{margin-bottom:1.6rem}
+.field-label{display:block;font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:.5rem;line-height:1.45}
+.field-label .opt{font-weight:400;font-style:italic;color:var(--text-muted);font-size:.78rem;margin-left:.3rem}
+input[type=text],input[type=number],input[type=email],textarea,select{
+  width:100%;background:var(--bg-card2);
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.92rem;padding:.72rem .95rem;
+  transition:border-color var(--tr),box-shadow var(--tr);outline:none;
+}
+input[type=text]:focus,input[type=number]:focus,input[type=email]:focus,textarea:focus,select:focus{
+  border-color:var(--border-focus);box-shadow:0 0 0 3px rgba(168,125,158,.1);
+}
+textarea{resize:vertical;min-height:90px}
+select{cursor:pointer;-webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239b93b5' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 1rem center;padding-right:2.5rem;
+}
+
+/* btn-option (radio-style) */
+.btn-group{display:flex;flex-direction:column;gap:.55rem}
+.btn-option{
+  display:flex;align-items:center;gap:.7rem;
+  background:var(--bg-card2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.8rem 1rem;
+  cursor:pointer;transition:all var(--tr);
+  font-size:.88rem;color:var(--text);width:100%;text-align:left;
+  font-family:'DM Sans',sans-serif;
+}
+.btn-option:hover{border-color:var(--mauve);background:rgba(168,125,158,.08)}
+.btn-option.selected{border-color:var(--mauve);background:rgba(168,125,158,.14);color:var(--cream)}
+.opt-dot{width:15px;height:15px;border-radius:50%;border:2px solid var(--mauve);flex-shrink:0;position:relative;transition:all var(--tr)}
+.btn-option.selected .opt-dot::after{content:'';position:absolute;inset:3px;background:var(--mauve);border-radius:50%}
+
+/* checkboxes */
+.checkbox-group{display:flex;flex-direction:column;gap:.45rem}
+.checkbox-item{
+  display:flex;align-items:center;gap:.7rem;
+  background:var(--bg-card2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:.7rem .95rem;
+  cursor:pointer;transition:all var(--tr);
+  font-size:.87rem;color:var(--text);user-select:none;
+}
+.checkbox-item:hover{border-color:var(--mauve);background:rgba(168,125,158,.08)}
+.checkbox-item.checked{border-color:var(--mauve);background:rgba(168,125,158,.14);color:var(--cream)}
+.checkbox-item input[type=checkbox]{display:none}
+.chk-box{
+  width:17px;height:17px;border-radius:4px;
+  border:2px solid var(--mauve);flex-shrink:0;
+  position:relative;transition:all var(--tr);background:transparent;
+}
+.checkbox-item.checked .chk-box{background:var(--mauve)}
+.checkbox-item.checked .chk-box::after{
+  content:'';position:absolute;
+  top:1px;left:4px;width:5px;height:9px;
+  border:2px solid #fff;border-top:none;border-left:none;
+  transform:rotate(45deg);
+}
+
+/* sliders */
+.slider-group{display:flex;flex-direction:column;gap:1.35rem}
+.slider-item{display:flex;flex-direction:column;gap:.4rem}
+.slider-row{display:flex;justify-content:space-between;align-items:center}
+.slider-name{font-size:.88rem;font-weight:500;color:var(--text)}
+.slider-val{font-size:.85rem;font-weight:600;color:var(--accent);min-width:3rem;text-align:right}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:5px;
+  background:rgba(168,125,158,.25);border-radius:100px;
+  outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:21px;height:21px;
+  border-radius:50%;background:var(--mauve);cursor:pointer;
+  box-shadow:0 2px 8px rgba(168,125,158,.4);
+  transition:transform var(--tr);
+}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+input[type=range]::-moz-range-thumb{
+  width:21px;height:21px;border-radius:50%;
+  background:var(--mauve);cursor:pointer;border:none;
+  box-shadow:0 2px 8px rgba(168,125,158,.4);
+}
+.slider-note{font-size:.75rem;color:var(--text-muted);font-style:italic}
+
+/* nav */
+.nav-buttons{display:flex;gap:.85rem;margin-top:2.5rem;flex-wrap:wrap}
+.btn-nav{
+  flex:1;min-width:110px;padding:.85rem 1.4rem;
+  border-radius:100px;font-family:'DM Sans',sans-serif;
+  font-size:.92rem;font-weight:600;cursor:pointer;transition:all var(--tr);border:none;
+}
+.btn-next{background:linear-gradient(135deg,var(--purple) 0%,var(--mauve) 100%);color:#fff;box-shadow:0 4px 16px rgba(107,58,158,.3)}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 6px 22px rgba(107,58,158,.45)}
+.btn-back{background:transparent;border:1px solid var(--border);color:var(--text-muted)}
+.btn-back:hover{border-color:var(--mauve);color:var(--text)}
+.btn-skip{
+  background:transparent;border:none;color:var(--text-muted);
+  font-size:.82rem;text-decoration:underline;text-underline-offset:3px;
+  cursor:pointer;padding:.4rem;font-family:'DM Sans',sans-serif;
+  width:100%;text-align:center;
+}
+.btn-skip:hover{color:var(--text)}
+
+/* field note */
+.field-note{
+  font-size:.76rem;color:var(--text-muted);font-style:italic;
+  margin-top:.4rem;padding:.45rem .75rem;
+  background:rgba(168,125,158,.07);
+  border-left:2px solid var(--mauve);border-radius:0 4px 4px 0;
+}
+.divider{height:1px;background:var(--border);margin:1.75rem 0}
+.cond-wrap{margin-top:.65rem;padding-left:1rem;border-left:2px solid var(--border)}
+
+/* ── MUSIC BUTTON ── */
+.music-btn{
+  position:fixed;bottom:1.4rem;right:1.4rem;z-index:200;
+  background:rgba(22,15,40,.9);border:1px solid var(--border);
+  border-radius:100px;padding:.5rem .95rem;cursor:pointer;
+  font-family:'DM Sans',sans-serif;font-size:.76rem;color:var(--text-muted);
+  transition:all var(--tr);display:flex;align-items:center;gap:.4rem;
+  backdrop-filter:blur(12px);
+}
+.music-btn:hover{border-color:var(--mauve);color:var(--text)}
+.music-btn.playing{border-color:var(--accent);color:var(--accent)}
+.music-icon{font-size:.95rem}
+.music-btn.playing .music-icon{animation:musictick 1.2s ease-in-out infinite}
+@keyframes musictick{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.2) rotate(5deg)}}
+
+/* ── COMPLETION ── */
+.completion{max-width:680px;width:100%;text-align:center}
+.completion-emoji{font-size:4rem;margin-bottom:1rem;animation:bounceIn .65s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bounceIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.completion-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,6vw,3rem);font-weight:700;color:var(--cream);margin-bottom:1rem;line-height:1.2}
+.completion-body{font-size:.95rem;color:var(--text-muted);max-width:480px;margin:0 auto 2rem;line-height:1.75}
+.data-preview{
+  background:var(--bg-card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:1.25rem 1.5rem;
+  text-align:left;margin-bottom:1.5rem;
+  max-height:280px;overflow-y:auto;
+}
+.data-preview pre{font-size:.72rem;color:var(--text-muted);white-space:pre-wrap;word-break:break-all;font-family:'Courier New',monospace;line-height:1.6}
+.export-btns{display:flex;gap:.85rem;justify-content:center;flex-wrap:wrap}
+.btn-export{
+  display:inline-flex;align-items:center;gap:.45rem;
+  background:var(--bg-card);border:1px solid var(--border);
+  color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.88rem;font-weight:500;padding:.7rem 1.4rem;
+  border-radius:100px;cursor:pointer;transition:all var(--tr);
+}
+.btn-export:hover{border-color:var(--mauve);background:rgba(168,125,158,.1)}
+.btn-export.accent{background:linear-gradient(135deg,var(--purple) 0%,var(--mauve) 100%);border-color:transparent;color:#fff}
+.btn-export.accent:hover{box-shadow:0 4px 16px rgba(107,58,158,.4)}
+
+/* ── FLASH ── */
+.flash{
+  position:fixed;bottom:5rem;right:1.4rem;
+  background:var(--success);color:#fff;
+  padding:.45rem .95rem;border-radius:100px;
+  font-size:.82rem;font-weight:500;z-index:300;
+  animation:flashIn .25s ease,flashOut .3s ease 1.6s forwards;pointer-events:none;
+}
+@keyframes flashIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes flashOut{to{opacity:0}}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- ── MUSIC BUTTON ── -->
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()">
+  <span class="music-icon" id="musicIcon">🎵</span>
+  <span id="musicLabel">focus mode</span>
+</button>
+
+<!-- ── PROGRESS BAR ── -->
+<div class="progress-bar hidden" id="progressBar">
+  <span class="prog-label" id="progLabel">1 / 10</span>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:10%"></div></div>
+  <span class="prog-name" id="progName"></span>
+</div>
+
+<!-- ════════════════════════════ LANDING ════════════════════════════ -->
+<div class="page" id="pageLanding">
+  <div class="landing">
+    <div class="stars">◆ ◆ ◆</div>
+    <p class="eyebrow">Patient-led research</p>
+    <h1 class="landing-title">The <em>Histamine</em><br>Project</h1>
+    <p class="landing-sub">Patient-led research on histamine, PMDD,<br>and the conditions nobody talks about together.</p>
+    <p class="landing-body">
+      An <strong>anonymous survey</strong> collecting data on antihistamine protocols
+      (famotidine + H1 blockers) for PMDD, with comorbidities including ADHD, hEDS/hypermobility, and MCAS.
+      About <strong>15 minutes</strong>. Built by a bioinformatics student who cried at the pharmacy
+      trying to buy famotidine. This is real research, made by a real person, for people like us.
+    </p>
+    <div class="landing-meta">
+      <span>Anonymous</span>
+      <span>~15 minutes</span>
+      <span>Progress saved automatically</span>
+    </div>
+    <button class="btn-primary" onclick="startSurvey()">Start the survey →</button>
+    <p class="privacy">Your data will never be sold. Ever.</p>
+  </div>
+</div>
+
+<!-- ════════════════════════════ SURVEY ════════════════════════════ -->
+<div class="page hidden" id="pageSurvey">
+  <div class="survey-wrap">
+    <div id="sectionRoot"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ COMPLETION ═══════════════════════════ -->
+<div class="page hidden" id="pageCompletion">
+  <div class="completion">
+    <div class="completion-emoji">🧬</div>
+    <h2 class="completion-title">You just contributed to research<br>that doesn't exist yet.</h2>
+    <p class="completion-body">Thank you for real. Every response fills a gap in the literature that affects millions of people. Your data matters — and so do you.</p>
+    <div class="stars">◆ ◆ ◆</div>
+    <div class="data-preview"><pre id="dataPreview"></pre></div>
+    <div class="export-btns">
+      <button class="btn-export accent" onclick="downloadJSON()">⬇ Download JSON</button>
+      <button class="btn-export" onclick="copyCSV()">📋 Copy as CSV</button>
+    </div>
+    <div style="margin-top:1.75rem">
+      <button class="btn-export" style="font-size:.78rem;opacity:.55" onclick="resetSurvey()">Start over</button>
+    </div>
+  </div>
+</div>
+
+<!-- Audio: add music.mp3 to repo root, or replace src with a CC0 chiptune URL.
+     Suggestion: https://opengameart.org/content/happy-chiptune (CC0) -->
+<audio id="bgMusic" loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+// ════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════
+const TOTAL = 10;
+const KEY = 'histamine_v2';
+
+const SECTION_NAMES = ['','Who are you?','Your diagnoses','Family history','Symptoms (before)','Triggers & patterns','Antihistamines?','How did it go?','Other treatments','Genetics','Last things'];
+
+const CONDITIONS = [
+  {k:'pmdd',  l:'PMDD (Premenstrual Dysphoric Disorder)'},
+  {k:'pme',   l:'PME (Premenstrual Exacerbation)'},
+  {k:'adhd',  l:'ADHD'},
+  {k:'heds_hsd', l:'hEDS / Hypermobility Spectrum Disorder'},
+  {k:'mcas',  l:'MCAS (Mast Cell Activation Syndrome)'},
+  {k:'endometriosis', l:'Endometriosis'},
+  {k:'pcos',  l:'PCOS'},
+  {k:'hashimoto', l:"Hashimoto's Thyroiditis"},
+  {k:'fibromyalgia', l:'Fibromyalgia'},
+  {k:'ibs',   l:'IBS / digestive stuff'},
+  {k:'anxiety', l:'Anxiety'},
+  {k:'depression', l:'Depression'},
+  {k:'autism', l:'Autism / autistic traits'},
+  {k:'other', l:'Something else'},
+];
+
+const SYMPTOMS = [
+  {k:'mood_crash',     l:'Mood crash / sudden depression'},
+  {k:'anxiety',        l:'Anxiety / dread'},
+  {k:'irritability',   l:'Rage / irritability'},
+  {k:'brain_fog',      l:'Brain fog'},
+  {k:'fatigue',        l:'Crushing fatigue'},
+  {k:'sleep',          l:'Sleep problems'},
+  {k:'joint_pain',     l:'Joint pain / hypermobility flares'},
+  {k:'bloating',       l:'Bloating / digestive chaos'},
+  {k:'skin_reactions', l:'Skin reactions / flushing / hives'},
+  {k:'palpitations',   l:'Heart palpitations'},
+  {k:'headaches',      l:'Headaches / migraines'},
+  {k:'adhd_worsening', l:'ADHD symptoms worsening'},
+  {k:'suicidal_ideation', l:'Suicidal ideation', sensitive:true},
+];
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let cur = 0;
+let D = {};
+
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify({cur, D})); } catch(e){}
+}
+function load() {
+  try {
+    const s = localStorage.getItem(KEY);
+    if (s) { const p = JSON.parse(s); D = p.D||{}; return p.cur||0; }
+  } catch(e){}
+  return 0;
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+function init() {
+  const saved = load();
+  if (D._done) { showCompletion(); }
+  else if (saved > 0) { cur = saved; showSurvey(); renderSection(cur); }
+  else { showLanding(); }
+}
+
+function showLanding()    { setPage('pageLanding');    show('progressBar',false); }
+function showSurvey()     { setPage('pageSurvey');     show('progressBar',true);  }
+function showCompletion() { setPage('pageCompletion'); show('progressBar',false); renderDone(); }
+
+function setPage(id) {
+  ['pageLanding','pageSurvey','pageCompletion'].forEach(p => {
+    document.getElementById(p).classList.toggle('hidden', p !== id);
+  });
+}
+function show(id, visible) {
+  document.getElementById(id).classList.toggle('hidden', !visible);
+}
+
+function startSurvey() {
+  cur = 1; save(); showSurvey(); renderSection(1);
+}
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+function next() {
+  collectSection();
+  let n = cur + 1;
+  if (n === 7 && D.tried_antihistamines !== 'yes') n = 8;
+  if (n > TOTAL) { done(); return; }
+  cur = n; save();
+  transition(cur,'forward');
+}
+
+function back() {
+  collectSection();
+  let p = cur - 1;
+  if (p === 7 && D.tried_antihistamines !== 'yes') p = 6;
+  if (p < 1) { save(); showLanding(); return; }
+  cur = p; save();
+  transition(cur,'back');
+}
+
+function skip() { next(); }
+
+function transition(n, dir) {
+  const root = document.getElementById('sectionRoot');
+  if (!root || !root.firstChild) { renderSection(n); return; }
+  const outCls = dir==='forward' ? 'anim-out' : 'anim-out-back';
+  root.firstChild.classList.add(outCls);
+  setTimeout(() => renderSection(n, dir), 210);
+}
+
+function updateProgress(n) {
+  document.getElementById('progLabel').textContent = n+' / '+TOTAL;
+  document.getElementById('progFill').style.width = (n/TOTAL*100)+'%';
+  document.getElementById('progName').textContent = SECTION_NAMES[n]||'';
+}
+
+// ════════════════════════════════════════════
+// COLLECT — scrape all [data-f] from current card
+// ════════════════════════════════════════════
+function collectSection() {
+  const card = document.querySelector('.section-card');
+  if (!card) return;
+  card.querySelectorAll('[data-f]').forEach(el => {
+    if (el.type==='checkbox') D[el.dataset.f] = el.checked;
+    else D[el.dataset.f] = el.value;
+  });
+  save();
+}
+
+// ════════════════════════════════════════════
+// DOM HELPERS
+// ════════════════════════════════════════════
+function mk(tag,cls,html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html!==undefined) e.innerHTML = html;
+  return e;
+}
+
+function fg(label, optl, inp, note) {
+  const g = mk('div','field-group');
+  const lb = mk('label','field-label');
+  lb.innerHTML = label + (optl ? ' <span class="opt">(optional)</span>' : '');
+  g.appendChild(lb);
+  if (Array.isArray(inp)) inp.forEach(i => g.appendChild(i));
+  else g.appendChild(inp);
+  if (note) { const n = mk('p','field-note'); n.textContent = note; g.appendChild(n); }
+  return g;
+}
+
+function input(f, ph, type='text') {
+  const el = mk('input');
+  el.type = type; el.dataset.f = f;
+  el.placeholder = ph||'';
+  el.value = D[f]!==undefined ? D[f] : '';
+  el.addEventListener('input', ()=>{ D[f]=el.value; save(); });
+  return el;
+}
+
+function textarea(f, ph) {
+  const el = mk('textarea');
+  el.dataset.f = f; el.placeholder = ph||'';
+  el.value = D[f]||'';
+  el.addEventListener('input', ()=>{ D[f]=el.value; save(); });
+  return el;
+}
+
+function radio(f, opts) {
+  // opts: [{v,l}]
+  const g = mk('div','btn-group');
+  g.dataset.f = f;
+  opts.forEach(o => {
+    const btn = mk('button','btn-option'+(D[f]===o.v?' selected':''));
+    btn.dataset.v = o.v;
+    btn.innerHTML = '<span class="opt-dot"></span><span>'+o.l+'</span>';
+    btn.addEventListener('click', ()=>{
+      g.querySelectorAll('.btn-option').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      D[f] = o.v; save();
+      // conditionals
+      document.querySelectorAll('[data-cif="'+f+'"]').forEach(el=>{
+        el.classList.toggle('hidden', !el.dataset.cval.split(',').includes(o.v));
+      });
+    });
+    g.appendChild(btn);
+  });
+  return g;
+}
+
+function checks(keys, prefix) {
+  // keys: [{k,l}], stored as prefix+k
+  const g = mk('div','checkbox-group');
+  keys.forEach(({k,l})=>{
+    const fn = prefix+k;
+    const item = mk('label','checkbox-item'+(D[fn]?' checked':''));
+    const inp = mk('input'); inp.type='checkbox'; inp.dataset.f=fn; inp.checked=!!D[fn];
+    const box = mk('span','chk-box');
+    const lbl = mk('span'); lbl.textContent=l;
+    item.appendChild(inp); item.appendChild(box); item.appendChild(lbl);
+    function toggle(v) {
+      inp.checked=v; D[fn]=v; item.classList.toggle('checked',v); save();
+    }
+    item.addEventListener('click', e=>{ if(e.target!==inp) toggle(!inp.checked); });
+    inp.addEventListener('change', ()=>toggle(inp.checked));
+    g.appendChild(item);
+  });
+  return g;
+}
+
+function sliders(syms, prefix) {
+  const g = mk('div','slider-group');
+  syms.forEach(({k,l,sensitive})=>{
+    const fn = prefix+k;
+    const item = mk('div','slider-item');
+    const row = mk('div','slider-row');
+    const name = mk('span','slider-name'); name.textContent=l;
+    const val = mk('span','slider-val'); val.textContent=(D[fn]||0)+'/10';
+    row.appendChild(name); row.appendChild(val);
+    const sl = mk('input'); sl.type='range'; sl.min=0; sl.max=10; sl.step=1;
+    sl.value = D[fn]||0; sl.dataset.f=fn;
+    sl.addEventListener('input', ()=>{ D[fn]=parseInt(sl.value); val.textContent=sl.value+'/10'; save(); });
+    item.appendChild(row); item.appendChild(sl);
+    if (sensitive) {
+      const note = mk('p','slider-note'); note.textContent="We know this one is hard to rate. Skip it if you need to.";
+      item.appendChild(note);
+    }
+    g.appendChild(item);
+  });
+  return g;
+}
+
+function navBtns(card, {showBack=true, showSkip=false, lastSection=false}={}) {
+  const nav = mk('div','nav-buttons');
+  if (showBack) {
+    const b = mk('button','btn-nav btn-back'); b.textContent='← Back';
+    b.addEventListener('click', back); nav.appendChild(b);
+  }
+  const n = mk('button','btn-nav btn-next');
+  n.textContent = lastSection ? 'Submit ✓' : 'Next →';
+  n.addEventListener('click', next); nav.appendChild(n);
+  if (showSkip) {
+    const s = mk('button','btn-skip'); s.textContent='Skip this section';
+    s.addEventListener('click', skip); nav.appendChild(s);
+  }
+  card.appendChild(nav);
+}
+
+function cond(f, vals) {
+  // wrapper that hides unless D[f] is in vals
+  const w = mk('div');
+  w.dataset.cif = f;
+  w.dataset.cval = vals;
+  if (!vals.split(',').includes(D[f]||'')) w.classList.add('hidden');
+  return w;
+}
+
+function header(card, n, title, intro) {
+  card.appendChild(mk('p','s-eyebrow','Section '+n+' / '+TOTAL));
+  card.appendChild(mk('h2','s-title',title));
+  card.appendChild(mk('p','s-intro',intro));
+}
+
+// ════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════
+function renderSection(n, dir) {
+  const root = document.getElementById('sectionRoot');
+  updateProgress(n);
+  const card = mk('div','section-card '+(dir==='back'?'anim-in-back':'anim-in'));
+  const builders = [null,s1,s2,s3,s4,s5,s6,s7,s8,s9,s10];
+  builders[n](card);
+  root.innerHTML='';
+  root.appendChild(card);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ═══ SECTION 1 ═══
+function s1(c) {
+  header(c,'1','Who are you?',"Just a few basics before we get into the good stuff.");
+
+  c.appendChild(fg('How old are you?',false,input('age','e.g. 28','number')));
+  c.appendChild(fg('What country are you in?',false,input('country','e.g. UK, USA, Germany')));
+  c.appendChild(fg('How would you describe your ethnicity?',true,input('ethnicity','e.g. White British, Latina, South Asian…'),'Optional, but helps with genetic pattern analysis.'));
+  c.appendChild(fg('How regular is your menstrual cycle?',false,radio('cycle_regularity',[
+    {v:'regular',l:'Pretty regular'},
+    {v:'irregular',l:'Does whatever it wants'},
+    {v:'no_cycle',l:"I don't have a cycle right now"},
+  ])));
+
+  const cycleLen = cond('cycle_regularity','regular,irregular');
+  cycleLen.className += ' cond-wrap';
+  cycleLen.appendChild(fg('Average cycle length in days?',false,input('cycle_length_days','e.g. 28','number')));
+  c.appendChild(cycleLen);
+
+  c.appendChild(fg('How old were you when you got your first period?',false,input('menarche_age','e.g. 12','number')));
+  c.appendChild(fg('Are you currently using hormonal contraception?',false,radio('hormonal_contraception',[
+    {v:'yes',l:'Yes'},{v:'no',l:'No'},
+  ])));
+
+  const contra = cond('hormonal_contraception','yes');
+  contra.className += ' cond-wrap';
+  contra.appendChild(fg('Which type?',false,radio('contraception_type',[
+    {v:'combined_pill',l:'Combined pill'},
+    {v:'progestin_only',l:'Progestin-only pill'},
+    {v:'hormonal_iud',l:'Hormonal IUD'},
+    {v:'copper_iud',l:'Copper IUD'},
+    {v:'implant',l:'Implant'},
+    {v:'other',l:'Other'},
+  ])));
+  c.appendChild(contra);
+
+  navBtns(c,{showBack:false});
+}
+
+// ═══ SECTION 2 ═══
+function s2(c) {
+  header(c,'2','Your diagnoses',"Check everything that applies — we'll ask separately which ones are official vs self-diagnosed.");
+
+  c.appendChild(fg("What conditions do you have?",false,checks(CONDITIONS,'dx_')));
+  c.appendChild(fg('Other diagnoses not listed?',true,textarea('dx_other_text','Describe anything else…')));
+  c.appendChild(mk('div','divider'));
+  c.appendChild(fg('Which of these are self-diagnosed? (check all that apply)',false,checks(CONDITIONS,'self_dx_')));
+
+  navBtns(c);
+}
+
+// ═══ SECTION 3 ═══
+function s3(c) {
+  header(c,'3','Family history',"Genetics matter here. Even if nobody in your family has a formal diagnosis, patterns count.");
+
+  c.appendChild(fg('Do any blood relatives have similar conditions?',false,checks(CONDITIONS,'family_history_')));
+  c.appendChild(fg('Which side of the family?',false,radio('family_side',[
+    {v:'maternal',l:'Maternal side'},
+    {v:'paternal',l:'Paternal side'},
+    {v:'both',l:'Both sides'},
+    {v:'not_sure',l:'Not sure'},
+  ])));
+  c.appendChild(fg("Who specifically? (as detailed as you're comfortable with)",true,
+    textarea('family_relation','e.g. mother has MCAS, sister has ADHD and PMDD, maternal aunt has hypermobility…')));
+
+  navBtns(c);
+}
+
+// ═══ SECTION 4 ═══
+function s4(c) {
+  header(c,'4','Symptoms before any treatment',"Rate these in the week or two before your period, before you tried anything. 0 = not a thing for me, 10 = ruins my life.");
+  c.appendChild(sliders(SYMPTOMS,'sym_pre_'));
+  navBtns(c);
+}
+
+// ═══ SECTION 5 ═══
+function s5(c) {
+  header(c,'5','Triggers & patterns',"Help us understand what sets things off.");
+
+  c.appendChild(fg('Do you react badly to high-histamine foods like red wine, aged cheese, or fermented stuff?',false,radio('histamine_food_reactions',[
+    {v:'yes',l:'Yes, definitely'},
+    {v:'maybe',l:"Maybe, I'm not sure"},
+    {v:'no',l:'No'},
+  ])));
+
+  const foodList = cond('histamine_food_reactions','yes');
+  foodList.className += ' cond-wrap';
+  foodList.appendChild(fg('Which ones bother you most?',false,textarea('histamine_foods_list','Red wine, leftover chicken, vinegar, aged cheese…')));
+  c.appendChild(foodList);
+
+  c.appendChild(fg('Did your symptoms start or significantly worsen after a COVID infection?',false,radio('post_covid',[
+    {v:'yes',l:'Yes'},
+    {v:'no',l:'No'},
+    {v:'maybe',l:"I had COVID but not sure if it changed anything"},
+  ])));
+  c.appendChild(fg('Do your symptoms change with the seasons?',false,radio('seasonal_variation',[
+    {v:'yes',l:'Yes'},{v:'no',l:'No'},{v:'not_sure',l:'Not sure'},
+  ])));
+  c.appendChild(fg('When did your symptoms start or first become significant?',false,radio('symptom_onset',[
+    {v:'always',l:"They've always been there"},
+    {v:'puberty',l:'They got worse at puberty'},
+    {v:'pregnancy',l:'After a pregnancy'},
+    {v:'covid',l:'After COVID'},
+    {v:'trauma',l:'After trauma or major stress'},
+    {v:'gradual',l:'Gradually over time'},
+    {v:'other',l:'Other'},
+  ])));
+
+  const onsetOther = cond('symptom_onset','other');
+  onsetOther.className += ' cond-wrap';
+  onsetOther.appendChild(fg('Can you describe when?',false,input('symptom_onset_other','Describe…')));
+  c.appendChild(onsetOther);
+
+  c.appendChild(fg('Does stress or emotional intensity make your luteal symptoms worse?',false,radio('stress_trigger',[
+    {v:'yes',l:'Yes'},{v:'no',l:'No'},{v:'sometimes',l:'Sometimes'},
+  ])));
+
+  navBtns(c);
+}
+
+// ═══ SECTION 6 ═══
+function s6(c) {
+  header(c,'6','Have you tried antihistamines?',"This is the heart of it.");
+
+  c.appendChild(fg('Have you tried antihistamines for PMDD / PME?',false,radio('tried_antihistamines',[
+    {v:'yes',l:'Yes'},
+    {v:'curious',l:"No, but I'm curious"},
+    {v:'no_idea',l:"No and I have no idea what you're talking about"},
+  ])));
+
+  const ahWrap = cond('tried_antihistamines','yes');
+
+  ahWrap.appendChild(fg('Which H2 blockers have you tried?',false,checks([
+    {k:'h2_famotidine',l:'Famotidine (Pepcid)'},
+    {k:'h2_ranitidine',l:'Ranitidine (Zantac — discontinued many places)'},
+    {k:'h2_cimetidine',l:'Cimetidine (Tagamet)'},
+    {k:'h2_other',l:'Another H2 blocker'},
+  ],'')));
+
+  ahWrap.appendChild(fg('Famotidine dose (if you used it)?',false,radio('famotidine_dose_mg',[
+    {v:'10mg',l:'10 mg'},{v:'20mg',l:'20 mg'},{v:'40mg',l:'40 mg'},{v:'varies',l:'I vary it'},
+  ])));
+
+  ahWrap.appendChild(fg('Which H1 blockers have you tried?',false,checks([
+    {k:'h1_loratadine',l:'Loratadine (Claritin)'},
+    {k:'h1_cetirizine',l:'Cetirizine (Zyrtec)'},
+    {k:'h1_fexofenadine',l:'Fexofenadine (Allegra)'},
+    {k:'h1_diphenhydramine',l:'Diphenhydramine (Benadryl)'},
+    {k:'h1_none',l:'No H1 blockers yet'},
+    {k:'h1_other',l:'Another H1 blocker'},
+  ],'')));
+
+  ahWrap.appendChild(fg('Any mast cell stabilizers?',false,checks([
+    {k:'mcs_cromolyn',l:'Cromolyn sodium (Gastrocrom)'},
+    {k:'mcs_quercetin',l:'Quercetin'},
+    {k:'mcs_ketotifen',l:'Ketotifen'},
+    {k:'mcs_none',l:'None'},
+  ],'')));
+
+  ahWrap.appendChild(fg('When do you take antihistamines?',false,radio('antihistamine_timing',[
+    {v:'luteal_only',l:'Only during luteal phase'},
+    {v:'daily',l:'Daily year-round'},
+    {v:'daily_higher_luteal',l:'Daily with higher dose in luteal phase'},
+    {v:'as_needed',l:'As needed'},
+  ])));
+
+  ahWrap.appendChild(fg('How long have you been on this protocol?',false,radio('protocol_duration',[
+    {v:'under_1mo',l:'Less than a month'},
+    {v:'1_6mo',l:'1–6 months'},
+    {v:'6_12mo',l:'6–12 months'},
+    {v:'1_2yr',l:'1–2 years'},
+    {v:'2plus_yr',l:'2+ years'},
+  ])));
+
+  c.appendChild(ahWrap);
+  navBtns(c);
+}
+
+// ═══ SECTION 7 ═══
+function s7(c) {
+  header(c,'7','How did it go?',"Same symptoms as before — rate them after starting the protocol.");
+
+  c.appendChild(sliders(SYMPTOMS,'sym_post_'));
+  c.appendChild(mk('div','divider'));
+
+  // overall effectiveness slider
+  const oeFg = mk('div','field-group');
+  const oeLb = mk('label','field-label'); oeLb.textContent='Overall effectiveness (0 = useless, 10 = life-changing)';
+  const oeRow = mk('div','slider-row');
+  const oeName = mk('span','slider-name'); oeName.textContent='Overall';
+  const oeVal = mk('span','slider-val'); oeVal.textContent=(D['overall_effectiveness']||0)+'/10';
+  oeRow.appendChild(oeName); oeRow.appendChild(oeVal);
+  const oeSl = mk('input'); oeSl.type='range'; oeSl.min=0; oeSl.max=10; oeSl.step=1;
+  oeSl.value=D['overall_effectiveness']||0; oeSl.dataset.f='overall_effectiveness';
+  oeSl.addEventListener('input',()=>{ D['overall_effectiveness']=parseInt(oeSl.value); oeVal.textContent=oeSl.value+'/10'; save(); });
+  oeFg.appendChild(oeLb); oeFg.appendChild(oeRow); oeFg.appendChild(oeSl);
+  c.appendChild(oeFg);
+
+  c.appendChild(fg('How quickly did you notice an effect?',false,radio('time_to_effect',[
+    {v:'immediately',l:'Almost immediately'},
+    {v:'1_2_cycles',l:'After 1–2 cycles'},
+    {v:'3plus_cycles',l:'After 3+ cycles'},
+    {v:'no_effect',l:'No effect'},
+  ])));
+  c.appendChild(fg('Any side effects worth mentioning?',true,textarea('side_effects_text','Drowsiness, dry mouth, nothing — whatever's true for you…')));
+  c.appendChild(fg('Would you recommend this protocol to someone like you?',false,radio('would_recommend',[
+    {v:'yes',l:'Yes'},{v:'no',l:'No'},{v:'not_sure',l:'Not sure yet'},
+  ])));
+
+  navBtns(c);
+}
+
+// ═══ SECTION 8 ═══
+function s8(c) {
+  header(c,'8','Other treatments',"Help us see the full picture.");
+
+  c.appendChild(fg("What else have you tried for your symptoms?",false,checks([
+    {k:'tx_ssri_snri',l:'SSRI or SNRI (antidepressants)'},
+    {k:'tx_stimulants_adhd',l:'ADHD stimulants (Adderall, Ritalin, etc.)'},
+    {k:'tx_non_stimulant_adhd',l:'Non-stimulant ADHD meds (Strattera, Guanfacine, etc.)'},
+    {k:'tx_combined_pill',l:'Combined oral contraceptive pill'},
+    {k:'tx_progestin_only',l:'Progestin-only contraception'},
+    {k:'tx_gnrh',l:'GnRH agonists (Lupron, Zoladex, etc.)'},
+    {k:'tx_magnesium',l:'Magnesium'},
+    {k:'tx_b6',l:'Vitamin B6'},
+    {k:'tx_low_histamine_diet',l:'Low histamine diet'},
+    {k:'tx_other',l:'Other'},
+  ],'')));
+  c.appendChild(fg('Other treatments not listed?',true,textarea('tx_other_text','Low-dose naltrexone, progesterone cream, acupuncture…')));
+
+  navBtns(c);
+}
+
+// ═══ SECTION 9 ═══
+function s9(c) {
+  header(c,'9','Genetics',"Nerdy optional section. Skip freely.");
+
+  c.appendChild(fg('Have you done genetic testing?',false,radio('has_genetic_data',[
+    {v:'yes',l:'Yes'},{v:'no',l:'No'},
+  ])));
+
+  const genWrap = cond('has_genetic_data','yes');
+  genWrap.className += ' cond-wrap';
+  genWrap.appendChild(fg('Which platform?',false,radio('genetic_platform',[
+    {v:'23andme',l:'23andMe'},
+    {v:'ancestry',l:'AncestryDNA'},
+    {v:'myheritage',l:'MyHeritage'},
+    {v:'other',l:'Other'},
+  ])));
+  genWrap.appendChild(fg('Would you be willing to share relevant genetic data?',false,radio('willing_to_share_genetics',[
+    {v:'yes',l:'Yes, happy to'},
+    {v:'maybe',l:'Maybe, tell me more first'},
+    {v:'no',l:'No thanks'},
+  ])));
+  c.appendChild(genWrap);
+
+  c.appendChild(fg('If you know any variants in DAO, HNMT, MAOB, ESR1, COMT, HRH1, HRH2 — drop them here',true,
+    textarea('genetic_notes_text','e.g. DAO rs2052129 +/+, COMT Val158Met heterozygous…')));
+
+  navBtns(c,{showSkip:true});
+}
+
+// ═══ SECTION 10 ═══
+function s10(c) {
+  header(c,'10','Last things',"Almost done. You're a star.");
+
+  c.appendChild(fg('How did you find out about this survey?',false,radio('discovery_source',[
+    {v:'reddit',l:'Reddit'},
+    {v:'doctor',l:'A doctor (rare but it happens)'},
+    {v:'friend',l:'A friend'},
+    {v:'own_research',l:'My own research'},
+    {v:'other',l:'Other'},
+  ])));
+  c.appendChild(fg('Anything else? Rants, questions, experiences — all welcome.',true,
+    textarea('notes_text','This is your space.')));
+  c.appendChild(fg("Can we reach out if we have follow-up questions? We'll never spam you.",false,radio('contact_consent',[
+    {v:'yes',l:'Yes, you can contact me'},
+    {v:'no',l:'No thanks'},
+  ])));
+
+  const emailWrap = cond('contact_consent','yes');
+  emailWrap.className += ' cond-wrap';
+  const emailNote = mk('p','field-note'); emailNote.textContent='Your email is stored separately and will never be exported with your survey data.';
+  emailWrap.appendChild(emailNote);
+  emailWrap.appendChild(fg('Your email:',false,input('contact_email','you@example.com','email')));
+  c.appendChild(emailWrap);
+
+  navBtns(c,{lastSection:true});
+}
+
+// ════════════════════════════════════════════
+// DONE
+// ════════════════════════════════════════════
+function done() {
+  collectSection();
+  D._done = true;
+  D._ts = new Date().toISOString();
+  save();
+  showCompletion();
+}
+
+function exportData() {
+  const out = {...D};
+  delete out.contact_email;
+  delete out._done; delete out._ts;
+  return out;
+}
+
+function renderDone() {
+  document.getElementById('dataPreview').textContent = JSON.stringify(exportData(),null,2);
+}
+
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(exportData(),null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='histamine_project_response.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function copyCSV() {
+  const data = exportData();
+  const keys = Object.keys(data);
+  const row = keys.map(k=>{
+    const v = data[k];
+    const s = (v===null||v===undefined) ? '' : String(v);
+    return (s.includes(',')||s.includes('"')||s.includes('\n')) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  });
+  const csv = keys.join(',') + '\n' + row.join(',');
+  navigator.clipboard.writeText(csv).then(()=>flash('Copied!')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=csv;
+    document.body.appendChild(ta);ta.select();document.execCommand('copy');
+    document.body.removeChild(ta);flash('Copied!');
+  });
+}
+
+function flash(msg) {
+  const f = mk('div','flash'); f.textContent=msg;
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),2100);
+}
+
+function resetSurvey() {
+  if (!confirm('Clear all answers and start over?')) return;
+  localStorage.removeItem(KEY);
+  D={}; cur=0; showLanding();
+}
+
+// ════════════════════════════════════════════
+// MUSIC
+// ════════════════════════════════════════════
+let playing = false;
+function toggleMusic() {
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicBtn');
+  const lbl = document.getElementById('musicLabel');
+  if (playing) {
+    audio.pause(); playing=false;
+    btn.classList.remove('playing'); lbl.textContent='focus mode';
+  } else {
+    audio.play().then(()=>{
+      playing=true; btn.classList.add('playing'); lbl.textContent='playing ♪';
+    }).catch(()=>flash('Add music.mp3 to the repo to enable audio 🎵'));
+  }
+}
+
+// ════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
