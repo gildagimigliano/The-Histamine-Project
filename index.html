@@ -415,9 +415,25 @@ const TOTAL = 10;
 const KEY = 'histamine_v2';
 const GOOGLE_SCRIPT_URL = '';
 
-const SUPABASE_URL = 'https://tenwtlbtxbavcbflfpam.supabase.com';
+const SUPABASE_URL = 'https://tenwtlbtxbavcbflfpam.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_R_VueXJKf5UCBldejKFrzw_I4zRv_OR';
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ── SUPABASE SCHEMA — run once in Database → SQL Editor ──────────
+   ALTER TABLE responses ENABLE ROW LEVEL SECURITY;
+   DROP POLICY IF EXISTS "public_insert" ON responses;
+   CREATE POLICY "public_insert" ON responses FOR INSERT TO anon WITH CHECK (true);
+
+   CREATE TABLE IF NOT EXISTS contacts (
+     id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+     response_id TEXT,
+     email       TEXT NOT NULL,
+     created_at  TIMESTAMPTZ DEFAULT now()
+   );
+   ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+   DROP POLICY IF EXISTS "public_insert" ON contacts;
+   CREATE POLICY "public_insert" ON contacts FOR INSERT TO anon WITH CHECK (true);
+   ───────────────────────────────────────────────────────────────── */
 
 const SECTION_NAMES = ['','Who are you?','Your diagnoses','Family history','Symptoms (before)','Triggers & patterns','Antihistamines?','How did it go?','Other treatments','Genetics','Last things'];
 
@@ -581,6 +597,8 @@ function collectSection() {
   const card = document.querySelector('.section-card');
   if (!card) return;
   card.querySelectorAll('[data-f]').forEach(el => {
+    // don't collect fields inside hidden conditional wrappers
+    if (el.closest('.hidden')) return;
     if (el.type==='checkbox') D[el.dataset.f] = el.checked;
     else D[el.dataset.f] = el.value;
   });
@@ -641,7 +659,8 @@ function textarea(f, ph) {
   return el;
 }
 
-function radio(f, opts) {
+function radio(f, opts, cfg) {
+  cfg = cfg || {};
   // opts: [{v,l}]
   const g = mk('div','btn-group');
   opts.forEach(o => {
@@ -652,10 +671,20 @@ function radio(f, opts) {
       g.querySelectorAll('.btn-option').forEach(b=>b.classList.remove('selected'));
       btn.classList.add('selected');
       D[f] = o.v; save();
-      // conditionals
+      // update conditionals
       document.querySelectorAll('[data-cif="'+f+'"]').forEach(el=>{
         el.classList.toggle('hidden', !el.dataset.cval.split(',').includes(o.v));
       });
+      // optional change callback
+      if (cfg.onChange) cfg.onChange(o.v);
+      // auto-scroll to next visible field (ADHD-friendly)
+      const fieldGrp = g.closest('.field-group');
+      if (fieldGrp) {
+        const nextEl = fieldGrp.nextElementSibling;
+        if (nextEl && !nextEl.classList.contains('hidden') && !nextEl.classList.contains('nav-buttons')) {
+          setTimeout(()=>nextEl.scrollIntoView({behavior:'smooth',block:'nearest'}),160);
+        }
+      }
     });
     g.appendChild(btn);
   });
@@ -756,19 +785,39 @@ function s1(c) {
   c.appendChild(fg('How old are you?',false,input('age','e.g. 28','number')));
   c.appendChild(fg('What country are you in?',false,sel('country',COUNTRIES)));
   c.appendChild(fg('How would you describe your ethnicity?',true,sel('ethnicity',ETHNICITIES),'Optional, but helps with genetic pattern analysis.'));
-  c.appendChild(fg('How regular is your menstrual cycle?',false,radio('cycle_regularity',[
+
+  c.appendChild(fg('Do you have a menstrual cycle?',false,
+    radio('has_cycle',[
+      {v:'yes',l:'Yes'},
+      {v:'no',l:'No'},
+      {v:'prefer_not_to_say',l:'Prefer not to say'},
+    ], {
+      onChange(v) {
+        if (v !== 'yes') {
+          ['cycle_regularity','cycle_length_days','menarche_age','hormonal_contraception','contraception_type']
+            .forEach(k => { delete D[k]; });
+          save();
+        }
+      }
+    })
+  ));
+
+  // All cycle-specific questions gated on has_cycle=yes
+  const cycleBlock = cond('has_cycle','yes');
+
+  cycleBlock.appendChild(fg('How regular is your cycle?',false,radio('cycle_regularity',[
     {v:'regular',l:'Pretty regular'},
     {v:'irregular',l:'Does whatever it wants'},
-    {v:'no_cycle',l:"I don't have a cycle right now"},
   ])));
 
   const cycleLen = cond('cycle_regularity','regular,irregular');
   cycleLen.className += ' cond-wrap';
   cycleLen.appendChild(fg('Average cycle length in days?',false,input('cycle_length_days','e.g. 28','number')));
-  c.appendChild(cycleLen);
+  cycleBlock.appendChild(cycleLen);
 
-  c.appendChild(fg('How old were you when you got your first period?',false,input('menarche_age','e.g. 12','number')));
-  c.appendChild(fg('Are you currently using hormonal contraception?',false,radio('hormonal_contraception',[
+  cycleBlock.appendChild(fg('How old were you when you got your first period?',false,input('menarche_age','e.g. 12','number')));
+
+  cycleBlock.appendChild(fg('Are you currently using hormonal contraception?',false,radio('hormonal_contraception',[
     {v:'yes',l:'Yes'},{v:'no',l:'No'},
   ])));
 
@@ -782,7 +831,9 @@ function s1(c) {
     {v:'implant',l:'Implant'},
     {v:'other',l:'Other'},
   ])));
-  c.appendChild(contra);
+  cycleBlock.appendChild(contra);
+
+  c.appendChild(cycleBlock);
 
   navBtns(c,{showBack:false});
 }
@@ -928,10 +979,13 @@ function s6(c) {
 
 // ═══ SECTION 7 ═══
 function s7(c) {
-  header(c,'7','How did it go?',"Same symptoms as before — rate them after starting the protocol.");
+  header(c,'7','How did it go?',"Rate the impact of the antihistamine protocol on your symptoms.");
 
-  c.appendChild(sliders(SYMPTOMS,'sym_post_'));
-  c.appendChild(mk('div','divider'));
+  // sym_post sliders only for people who have a cycle (mirrors the sym_pre skip in s4)
+  const symPostWrap = cond('has_cycle','yes');
+  symPostWrap.appendChild(sliders(SYMPTOMS,'sym_post_'));
+  symPostWrap.appendChild(mk('div','divider'));
+  c.appendChild(symPostWrap);
 
   // overall effectiveness slider
   const oeFg = mk('div','field-group');
@@ -1041,16 +1095,26 @@ function s10(c) {
 // ════════════════════════════════════════════
 // DONE
 // ════════════════════════════════════════════
-async function submitToSupabase(responseId) {
-  const responsePayload = { id: responseId, submitted_at: D._ts, ...exportData() };
+async function submitToSupabase() {
+  // All form data goes into a single JSONB column — no per-field columns needed
+  const { data: rows, error: respErr } = await db
+    .from('responses')
+    .insert({ data: exportData() })
+    .select('id')
+    .single();
 
-  const { error: respErr } = await db.from('responses').insert(responsePayload);
-  if (respErr) throw respErr;
+  if (respErr) {
+    console.error('responses insert error:', respErr);
+    throw respErr;
+  }
 
   const email = D.contact_email ? D.contact_email.trim() : '';
-  if (email) {
-    const { error: contErr } = await db.from('contacts').insert({ response_id: responseId, email });
-    if (contErr) throw contErr;
+  if (email && rows?.id) {
+    // Best-effort: don't break the submission if email save fails
+    const { error: contErr } = await db
+      .from('contacts')
+      .insert({ response_id: rows.id, email });
+    if (contErr) console.warn('Email save failed (non-fatal):', contErr.message);
   }
 }
 
@@ -1066,15 +1130,15 @@ async function done() {
   statusEl.className = 'submit-status pending';
   statusEl.textContent = 'Saving your response…';
 
-  const responseId = crypto.randomUUID();
   try {
-    await submitToSupabase(responseId);
+    await submitToSupabase();
     statusEl.className = 'submit-status ok';
     statusEl.textContent = 'Your response has been saved. Thank you!';
   } catch (err) {
     console.error('Supabase error:', err);
+    const detail = err?.message || err?.details || JSON.stringify(err);
     statusEl.className = 'submit-status error';
-    statusEl.textContent = "Couldn't save automatically — please download your data below so nothing is lost.";
+    statusEl.textContent = "Couldn't save automatically — please download your data below. (" + detail + ")";
     fallbackEl.style.display = 'block';
   }
 }
