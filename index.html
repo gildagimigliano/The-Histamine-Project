@@ -271,21 +271,6 @@ input[type=range]::-moz-range-thumb{
 .divider{height:1px;background:var(--border);margin:1.75rem 0}
 .cond-wrap{margin-top:.65rem;padding-left:1rem;border-left:2px solid var(--border)}
 
-/* ── MUSIC BUTTON ── */
-.music-btn{
-  position:fixed;bottom:1.4rem;right:1.4rem;z-index:200;
-  background:rgba(255,240,245,.95);border:1px solid var(--border);
-  border-radius:100px;padding:.5rem .95rem;cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--text-muted);
-  transition:all var(--tr);display:flex;align-items:center;gap:.4rem;
-  backdrop-filter:blur(12px);touch-action:manipulation;
-}
-.music-btn:hover{border-color:var(--mauve);color:var(--text)}
-.music-btn.playing{border-color:var(--accent);color:var(--accent)}
-.music-icon{font-size:.95rem}
-.music-btn.playing .music-icon{animation:musictick 1.2s ease-in-out infinite}
-@keyframes musictick{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.2) rotate(5deg)}}
-
 /* ── COMPLETION ── */
 .completion{max-width:680px;width:100%;text-align:center}
 .completion-emoji{font-size:4rem;margin-bottom:1rem;animation:bounceIn .65s cubic-bezier(.34,1.56,.64,1)}
@@ -336,12 +321,6 @@ input[type=range]::-moz-range-thumb{
 </style>
 </head>
 <body>
-
-<!-- ── MUSIC BUTTON ── -->
-<button class="music-btn" id="musicBtn" onclick="toggleMusic()">
-  <span class="music-icon" id="musicIcon">🎵</span>
-  <span id="musicLabel">focus mode</span>
-</button>
 
 <!-- ── PROGRESS BAR ── -->
 <div class="progress-bar hidden" id="progressBar">
@@ -400,12 +379,6 @@ input[type=range]::-moz-range-thumb{
     </div>
   </div>
 </div>
-
-<!-- Audio: add music.mp3 to repo root, or replace src with a CC0 chiptune URL.
-     Suggestion: https://opengameart.org/content/happy-chiptune (CC0) -->
-<audio id="bgMusic" loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
 
 <script>
 // ════════════════════════════════════════════
@@ -1190,24 +1163,6 @@ function resetSurvey() {
   if (!confirm('Clear all answers and start over?')) return;
   localStorage.removeItem(KEY);
   D={}; cur=0; showLanding();
-}
-
-// ════════════════════════════════════════════
-// MUSIC
-// ════════════════════════════════════════════
-let playing = false;
-function toggleMusic() {
-  const audio = document.getElementById('bgMusic');
-  const btn = document.getElementById('musicBtn');
-  const lbl = document.getElementById('musicLabel');
-  if (playing) {
-    audio.pause(); playing=false;
-    btn.classList.remove('playing'); lbl.textContent='focus mode';
-  } else {
-    audio.play().then(()=>{
-      playing=true; btn.classList.add('playing'); lbl.textContent='playing ♪';
-    }).catch(()=>flash('Add music.mp3 to the repo to enable audio 🎵'));
-  }
 }
 
 // ════════════════════════════════════════════
